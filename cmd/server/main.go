@@ -1,7 +1,7 @@
 package main
 
 import (
-	"log"
+	"Log"
 
 	"github.com/VVoses/proglog/internal/server"
 )
