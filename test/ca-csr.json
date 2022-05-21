@@ -1,0 +1,16 @@
+{
+  "CN": "bolleCA",
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names" : [
+    {
+      "C": "NO",
+      "L": "OS",
+      "ST": "Oslo",
+      "O": "Bollemor",
+      "OU": "Gutterommet AS"
+    }
+  ]
+}
