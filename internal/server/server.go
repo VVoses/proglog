@@ -3,13 +3,12 @@ package server
 import (
 	"context"
 	"strings"
+	"time"
 
 	api "github.com/VVoses/proglog/api/v1"
 
 	grpcmiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpcauth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
-
-	"time"
 
 	grpczap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
 	grpcctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"

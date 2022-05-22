@@ -4,11 +4,12 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"google.golang.org/grpc/status"
 	"io/ioutil"
 	"os"
 	"testing"
 	"time"
+
+	"google.golang.org/grpc/status"
 
 	"github.com/stretchr/testify/require"
 	"github.com/travisjeffery/go-dynaport"

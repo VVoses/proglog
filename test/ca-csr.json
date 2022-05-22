@@ -4,7 +4,7 @@
     "algo": "rsa",
     "size": 2048
   },
-  "names" : [
+  "names": [
     {
       "C": "NO",
       "L": "OS",

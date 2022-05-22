@@ -2,10 +2,12 @@ package log
 
 import (
 	"fmt"
-	api "github.com/VVoses/proglog/api/v1"
-	"google.golang.org/protobuf/proto"
 	"os"
 	"path"
+
+	"google.golang.org/protobuf/proto"
+
+	api "github.com/VVoses/proglog/api/v1"
 )
 
 type segment struct {

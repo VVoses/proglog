@@ -1,11 +1,12 @@
 package log
 
 import (
-	api "github.com/VVoses/proglog/api/v1"
 	"io"
 	"io/ioutil"
 	"os"
 	"testing"
+
+	api "github.com/VVoses/proglog/api/v1"
 
 	"github.com/stretchr/testify/require"
 )

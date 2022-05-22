@@ -1,10 +1,11 @@
 package log
 
 import (
-	api "github.com/VVoses/proglog/api/v1"
 	"io/ioutil"
 	"os"
 	"testing"
+
+	api "github.com/VVoses/proglog/api/v1"
 
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"

@@ -1,7 +1,6 @@
 package log
 
 import (
-	api "github.com/VVoses/proglog/api/v1"
 	"io"
 	"io/ioutil"
 	"os"
@@ -10,6 +9,8 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+
+	api "github.com/VVoses/proglog/api/v1"
 )
 
 type Log struct {
