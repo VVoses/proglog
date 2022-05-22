@@ -22,6 +22,8 @@ import (
 )
 
 func TestAgent(t *testing.T) {
+	var agents []*agent.Agent
+
 	serverTLSConfig, err := config.SetupTLSConfig(
 		config.TLSConfig{
 			CertFile:      config.ServerCertFile,
@@ -44,7 +46,6 @@ func TestAgent(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	var agents []*agent.Agent
 	for i := 0; i < 3; i++ {
 		ports := dynaport.Get(2)
 		bindAddr := fmt.Sprintf("%s:%d", "127.0.0.1", ports[0])
@@ -61,9 +62,10 @@ func TestAgent(t *testing.T) {
 			)
 		}
 
-		agnt, err := agent.New(
+		agent, err := agent.New(
 			agent.Config{
 				NodeName:        fmt.Sprintf("%d", i),
+				Bootstrap:       i == 0,
 				StartJoinAddrs:  startJoinAddrs,
 				BindAddr:        bindAddr,
 				RPCPort:         rpcPort,
@@ -76,17 +78,18 @@ func TestAgent(t *testing.T) {
 		)
 		require.NoError(t, err)
 
-		agents = append(agents, agnt)
+		agents = append(agents, agent)
 	}
 	defer func() {
-		for _, agnt := range agents {
-			err := agnt.Shutdown()
-			require.NoError(t, err)
+		for _, agent := range agents {
+			_ = agent.Shutdown()
 			require.NoError(t,
-				os.RemoveAll(agnt.Config.DataDir),
+				os.RemoveAll(agent.Config.DataDir),
 			)
 		}
 	}()
+
+	time.Sleep(3 * time.Second)
 
 	leaderClient := client(t, agents[0], peerTLSConfig)
 	produceResponse, err := leaderClient.Produce(
@@ -98,8 +101,19 @@ func TestAgent(t *testing.T) {
 		},
 	)
 	require.NoError(t, err)
-
 	consumeResponse, err := leaderClient.Consume(
+		context.Background(),
+		&api.ConsumeRequest{
+			Offset: produceResponse.Offset,
+		},
+	)
+	require.NoError(t, err)
+	require.Equal(t, consumeResponse.Record.Value, []byte("foo"))
+
+	time.Sleep(3 * time.Second)
+
+	followerClient := client(t, agents[1], peerTLSConfig)
+	consumeResponse, err = followerClient.Consume(
 		context.Background(),
 		&api.ConsumeRequest{
 			Offset: produceResponse.Offset,
@@ -119,18 +133,6 @@ func TestAgent(t *testing.T) {
 	got := status.Code(err)
 	want := status.Code(api.ErrOffsetOutOfRange{}.GRPCStatus().Err())
 	require.Equal(t, got, want)
-
-	time.Sleep(3 * time.Second)
-
-	followerClient := client(t, agents[1], peerTLSConfig)
-	consumeResponse, err = followerClient.Consume(
-		context.Background(),
-		&api.ConsumeRequest{
-			Offset: produceResponse.Offset,
-		},
-	)
-	require.NoError(t, err)
-	require.Equal(t, consumeResponse.Record.Value, []byte("foo"))
 }
 
 func client(
@@ -143,11 +145,10 @@ func client(
 	rpcAddr, err := agent.Config.RPCAddr()
 	require.NoError(t, err)
 	conn, err := grpc.Dial(
-		fmt.Sprintf("%s", rpcAddr),
+		rpcAddr,
 		opts...,
 	)
 	require.NoError(t, err)
 	client := api.NewLogClient(conn)
 	return client
-
 }
