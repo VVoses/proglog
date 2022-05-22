@@ -2,9 +2,24 @@ package server
 
 import (
 	"context"
+	"strings"
+
 	api "github.com/VVoses/proglog/api/v1"
+
 	grpcmiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpcauth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
+
+	"time"
+
+	grpczap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
+	grpcctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
+
+	"go.opencensus.io/plugin/ocgrpc"
+	"go.opencensus.io/stats/view"
+	"go.opencensus.io/trace"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
@@ -31,18 +46,58 @@ func NewGRPCServer(config *Config, opts ...grpc.ServerOption) (
 	*grpc.Server,
 	error,
 ) {
-	opts = append(opts, grpc.StreamInterceptor(
-		grpcmiddleware.ChainStreamServer(
-			grpcauth.StreamServerInterceptor(authenticate),
-		)),
-		grpc.UnaryInterceptor(grpcmiddleware.ChainUnaryServer(
-			grpcauth.UnaryServerInterceptor(authenticate),
-		)))
+
+	//setup trace interceptor
+	logger := zap.L().Named("server")
+	zapOpts := []grpczap.Option{
+		grpczap.WithDurationField(
+			func(duration time.Duration) zapcore.Field {
+				return zap.Int64(
+					"grpc.time_ns",
+					duration.Nanoseconds(),
+				)
+			},
+		),
+	}
+
+	//sample all Produce cals, and 1/2 of other calls
+	halfSampler := trace.ProbabilitySampler(0.5)
+	trace.ApplyConfig(trace.Config{
+		DefaultSampler: func(p trace.SamplingParameters) trace.SamplingDecision {
+			if strings.Contains(p.Name, "Produce") {
+				return trace.SamplingDecision{Sample: true}
+			}
+			return halfSampler(p)
+		},
+	})
+
+	err := view.Register(ocgrpc.DefaultServerViews...)
+	if err != nil {
+		return nil, err
+	}
+
+	opts = append(opts,
+		grpc.StreamInterceptor(
+			grpcmiddleware.ChainStreamServer(
+				grpcctxtags.StreamServerInterceptor(),
+				grpczap.StreamServerInterceptor(logger, zapOpts...),
+				grpcauth.StreamServerInterceptor(authenticate),
+			)),
+		grpc.UnaryInterceptor(
+			grpcmiddleware.ChainUnaryServer(
+				grpcctxtags.UnaryServerInterceptor(),
+				grpczap.UnaryServerInterceptor(logger, zapOpts...),
+				grpcauth.UnaryServerInterceptor(authenticate),
+			)),
+		grpc.StatsHandler(&ocgrpc.ServerHandler{}),
+	)
+
 	gsrv := grpc.NewServer(opts...)
 	srv, err := newgrpcServer(config)
 	if err != nil {
 		return nil, err
 	}
+
 	api.RegisterLogServer(gsrv, srv)
 	return gsrv, nil
 }

@@ -1,2 +1,4 @@
 .idea
 proglog.iml
+
+/api/v1/**.pb.go
