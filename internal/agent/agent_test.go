@@ -9,8 +9,6 @@ import (
 	"testing"
 	"time"
 
-	"google.golang.org/grpc/status"
-
 	"github.com/stretchr/testify/require"
 	"github.com/travisjeffery/go-dynaport"
 	"google.golang.org/grpc"
@@ -19,6 +17,7 @@ import (
 	api "github.com/VVoses/proglog/api/v1"
 	"github.com/VVoses/proglog/internal/agent"
 	"github.com/VVoses/proglog/internal/config"
+	"github.com/VVoses/proglog/internal/loadbalance"
 )
 
 func TestAgent(t *testing.T) {
@@ -101,6 +100,9 @@ func TestAgent(t *testing.T) {
 		},
 	)
 	require.NoError(t, err)
+
+	time.Sleep(3 * time.Second)
+
 	consumeResponse, err := leaderClient.Consume(
 		context.Background(),
 		&api.ConsumeRequest{
@@ -109,8 +111,6 @@ func TestAgent(t *testing.T) {
 	)
 	require.NoError(t, err)
 	require.Equal(t, consumeResponse.Record.Value, []byte("foo"))
-
-	time.Sleep(3 * time.Second)
 
 	followerClient := client(t, agents[1], peerTLSConfig)
 	consumeResponse, err = followerClient.Consume(
@@ -121,18 +121,6 @@ func TestAgent(t *testing.T) {
 	)
 	require.NoError(t, err)
 	require.Equal(t, consumeResponse.Record.Value, []byte("foo"))
-
-	consumeResponse, err = leaderClient.Consume(
-		context.Background(),
-		&api.ConsumeRequest{
-			Offset: produceResponse.Offset + 1,
-		},
-	)
-	require.Nil(t, consumeResponse)
-	require.Error(t, err)
-	got := status.Code(err)
-	want := status.Code(api.ErrOffsetOutOfRange{}.GRPCStatus().Err())
-	require.Equal(t, got, want)
 }
 
 func client(
@@ -145,9 +133,11 @@ func client(
 	rpcAddr, err := agent.Config.RPCAddr()
 	require.NoError(t, err)
 	conn, err := grpc.Dial(
-		rpcAddr,
-		opts...,
-	)
+		fmt.Sprintf(
+			"%s:///%s",
+			loadbalance.Name,
+			rpcAddr,
+		), opts...)
 	require.NoError(t, err)
 	client := api.NewLogClient(conn)
 	return client

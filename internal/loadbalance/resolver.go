@@ -67,7 +67,7 @@ func init() {
 var _ resolver.Resolver = (*Resolver)(nil)
 
 func (r *Resolver) ResolveNow(
-	options resolver.ResolveNowOptions,
+	resolver.ResolveNowOptions,
 ) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
