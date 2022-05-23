@@ -39,8 +39,9 @@ func (r *Resolver) Build(
 	if opts.DialCreds != nil {
 		dialOpts = append(
 			dialOpts,
-			grpc.WithTransportCredentials(opts.DialCreds),
-		)
+			grpc.WithTransportCredentials(
+				opts.DialCreds,
+			))
 	}
 	r.serviceConfig = r.clientConn.ParseServiceConfig(
 		fmt.Sprintf(`{"loadBalancingConfig":[{"%s":{}}]}`, Name),
@@ -79,6 +80,7 @@ func (r *Resolver) ResolveNow(
 			"failed to resolve server",
 			zap.Error(err),
 		)
+		return
 	}
 	var addrs []resolver.Address
 	for _, server := range res.Servers {

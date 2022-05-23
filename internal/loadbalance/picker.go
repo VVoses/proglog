@@ -18,7 +18,9 @@ type Picker struct {
 	current   uint64
 }
 
-func (p *Picker) Build(buildInfo base.PickerBuildInfo) balancer.Picker {
+func (p *Picker) Build(
+	buildInfo base.PickerBuildInfo,
+) balancer.Picker {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	var followers []balancer.SubConn
@@ -39,15 +41,16 @@ func (p *Picker) Build(buildInfo base.PickerBuildInfo) balancer.Picker {
 
 var _ balancer.Picker = (*Picker)(nil)
 
-func (p *Picker) Pick(info balancer.PickInfo) (
+func (p *Picker) Pick(
+	info balancer.PickInfo,
+) (
 	balancer.PickResult,
 	error,
 ) {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
 	var result balancer.PickResult
-	if strings.Contains(info.FullMethodName, "Produce") ||
-		len(p.followers) == 0 {
+	if strings.Contains(info.FullMethodName, "Produce") || len(p.followers) == 0 {
 		result.SubConn = p.leader
 	} else if strings.Contains(info.FullMethodName, "Consume") {
 		result.SubConn = p.nextFollower()
