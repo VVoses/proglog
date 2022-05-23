@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/travisjeffery/go-dynaport"
 
-	. "github.com/VVoses/proglog/internal/discovery"
+	. "github.com/vvoses/proglog/internal/discovery"
 )
 
 func TestMembership(t *testing.T) {
