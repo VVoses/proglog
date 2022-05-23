@@ -1,19 +1,19 @@
 {{ if .Values.service.lb }}
-apiVersion: v1
+apiVersion: metacontroller.k8s.io/v1alpha1
 kind: DecoratorController
 metadata:
   name: service-per-pod
 spec:
   resources:
-  - apiVersion: apps/v1
-    resource: statefulsets
-    annotationSelector:
-      matchExpressions:
-      - {key: service-per-pod-label, operator: Exists}
-      - {key: service-per-pod-ports, operator: Exists}
+    - apiVersion: apps/v1
+      resource: statefulsets
+      annotationSelector:
+        matchExpressions:
+          - {key: service-per-pod-label, operator: Exists}
+          - {key: service-per-pod-ports, operator: Exists}
   attachments:
-  - apiVersion: v1
-    resource: services
+    - apiVersion: v1
+      resource: services
   hooks:
     sync:
       webhook:
@@ -21,7 +21,8 @@ spec:
     finalize:
       webhook:
         url: "http://service-per-pod.metacontroller/delete-service-per-pod"
-
+# END: decorator_controller
+# START: webhook
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -29,7 +30,7 @@ metadata:
   namespace: metacontroller
   name: service-per-pod-hooks
 data:
-  {{ (.Files.Glob "hooks/*").AsConfig | indent 2 }}
+{{ (.Files.Glob "hooks/*").AsConfig | indent 2 }}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -52,8 +53,8 @@ spec:
           imagePullPolicy: Always
           workingDir: /hooks
           volumeMounts:
-            - mountPath: /hooks
-              name: hooks
+            - name: hooks
+              mountPath: /hooks
       volumes:
         - name: hooks
           configMap:

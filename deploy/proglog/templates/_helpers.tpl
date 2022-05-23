@@ -1,3 +1,4 @@
+{{/* vim: set filetype=mustache: */}}
 {{/*
 Expand the name of the chart.
 */}}
@@ -55,8 +56,8 @@ Create the name of the service account to use
 */}}
 {{- define "proglog.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "proglog.fullname" .) .Values.serviceAccount.name }}
+    {{- default (include "proglog.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
-{{- default "default" .Values.serviceAccount.name }}
+    {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}

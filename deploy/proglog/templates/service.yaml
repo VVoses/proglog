@@ -19,5 +19,4 @@ spec:
       protocol: "UDP"
       port: {{ .Values.serfPort }}
       targetPort: {{ .Values.serfPort }}
-  selector:
-    {{- include "proglog.selectorLabels" . | nindent 4 }}
+  selector: {{- include "proglog.selectorLabels" . | nindent 4 }}
