@@ -7,7 +7,7 @@ import (
 
 	"google.golang.org/protobuf/proto"
 
-	api "github.com/VVoses/proglog/api/v1"
+	api "github.com/vvoses/proglog/api/v1"
 )
 
 type segment struct {

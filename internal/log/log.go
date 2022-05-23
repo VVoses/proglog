@@ -10,7 +10,7 @@ import (
 	"strings"
 	"sync"
 
-	api "github.com/VVoses/proglog/api/v1"
+	api "github.com/vvoses/proglog/api/v1"
 )
 
 type Log struct {

@@ -12,7 +12,7 @@ import (
 	"google.golang.org/grpc/resolver"
 	"google.golang.org/grpc/serviceconfig"
 
-	api "github.com/VVoses/proglog/api/v1"
+	api "github.com/vvoses/proglog/api/v1"
 )
 
 type Resolver struct {

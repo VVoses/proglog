@@ -2,6 +2,7 @@ package loadbalance_test
 
 import (
 	"net"
+	"net/url"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -12,10 +13,11 @@ import (
 	"google.golang.org/grpc/resolver"
 	"google.golang.org/grpc/serviceconfig"
 
-	api "github.com/VVoses/proglog/api/v1"
-	"github.com/VVoses/proglog/internal/config"
+	api "github.com/vvoses/proglog/api/v1"
+	"github.com/vvoses/proglog/internal/config"
+	"github.com/vvoses/proglog/internal/server"
+
 	"github.com/VVoses/proglog/internal/loadbalance"
-	"github.com/VVoses/proglog/internal/server"
 )
 
 func TestResolver(t *testing.T) {
@@ -63,7 +65,7 @@ func TestResolver(t *testing.T) {
 	r := &loadbalance.Resolver{}
 	_, err = r.Build(
 		resolver.Target{
-			Endpoint: l.Addr().String(),
+			URL: url.URL{Path: l.Addr().String()},
 		},
 		conn,
 		opts,

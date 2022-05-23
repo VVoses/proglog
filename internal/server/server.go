@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	api "github.com/VVoses/proglog/api/v1"
+	api "github.com/vvoses/proglog/api/v1"
 
 	grpcmiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpcauth "github.com/grpc-ecosystem/go-grpc-middleware/auth"

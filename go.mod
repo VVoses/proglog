@@ -1,6 +1,6 @@
-module github.com/VVoses/proglog
+module github.com/vvoses/proglog
 
-go 1.17
+go 1.14
 
 require (
 	github.com/casbin/casbin v1.9.1

@@ -10,7 +10,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/VVoses/proglog/internal/loadbalance"
+	"github.com/vvoses/proglog/internal/loadbalance"
 )
 
 func TestPickerNoSubConnAvailable(t *testing.T) {

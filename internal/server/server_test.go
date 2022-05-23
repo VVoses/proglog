@@ -9,9 +9,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/VVoses/proglog/internal/auth"
-	"github.com/VVoses/proglog/internal/config"
-	"github.com/VVoses/proglog/internal/log"
+	"github.com/vvoses/proglog/internal/auth"
+	"github.com/vvoses/proglog/internal/config"
+	"github.com/vvoses/proglog/internal/log"
 
 	"go.opencensus.io/examples/exporter"
 
@@ -24,7 +24,7 @@ import (
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/status"
 
-	api "github.com/VVoses/proglog/api/v1"
+	api "github.com/vvoses/proglog/api/v1"
 )
 
 var debug = flag.Bool("debug", false, "Enable observability for debugging.")

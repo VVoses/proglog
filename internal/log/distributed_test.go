@@ -13,8 +13,8 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/travisjeffery/go-dynaport"
 
-	api "github.com/VVoses/proglog/api/v1"
-	"github.com/VVoses/proglog/internal/log"
+	api "github.com/vvoses/proglog/api/v1"
+	"github.com/vvoses/proglog/internal/log"
 )
 
 func TestMultipleNodes(t *testing.T) {
