@@ -1,29 +1,19 @@
 # README #
 
-This README would normally document whatever steps are necessary to get your application up and running.
+Distributed log
 
-### What is this repository for? ###
+### Distributed log ###
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+* A distributed log written in Go. Uses raft-algorithm for data-replication, and gRPC for communication.
+* Version 1.0.0
 
-### How do I get set up? ###
+### Setup ###
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
-
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
+#### Compile gRPC clients and servers from protobuf
+ $ make compile
+#### Generate TLS certificates
+ $ make gencert
+#### Build docker image
+ $ make build-docker
+#### Run tests
+ $ make test
